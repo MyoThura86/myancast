@@ -12,7 +12,6 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Notifications
 import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material3.CenterAlignedTopAppBar
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -43,8 +42,6 @@ import com.example.myancast.ui.components.PodcastListItem
 import com.example.myancast.ui.components.SectionHeader
 import com.example.myancast.ui.theme.AppConfig
 import com.example.myancast.ui.theme.MyanCastTheme
-import com.example.myancast.ui.theme.TextHi
-import com.example.myancast.ui.theme.TextLo
 
 // ═══════════════════════════════════════════════
 // SCREEN
@@ -54,7 +51,6 @@ import com.example.myancast.ui.theme.TextLo
 fun HomeScreen(
     onPodcastClick: (String) -> Unit,
     onSettingsClick: () -> Unit = {},
-    onNotificationClick: () -> Unit = {},
     onOpenPlayer: () -> Unit = {},                                     // ← ★ ဆက်နားထောင်ရန်
     vm: HomeViewModel = viewModel(factory = HomeViewModel.factory())   // ← ★ factory
 ) {
@@ -76,22 +72,15 @@ fun HomeScreen(
                     Text(
                         text = "MyanCast",
                         style = MaterialTheme.typography.titleLarge,
-                        color = TextHi
+                        color = MaterialTheme.colorScheme.onSurface
                     )
                 },
                 actions = {
-                    IconButton(onClick = onNotificationClick) {
-                        Icon(
-                            imageVector = Icons.Filled.Notifications,
-                            contentDescription = "Notifications",
-                            tint = TextLo
-                        )
-                    }
                     IconButton(onClick = onSettingsClick) {
                         Icon(
                             imageVector = Icons.Filled.Settings,
-                            contentDescription = "Settings",
-                            tint = TextLo
+                            contentDescription = "ဆက်တင်",
+                            tint = MaterialTheme.colorScheme.onSurfaceVariant
                         )
                     }
                 },
@@ -162,12 +151,12 @@ private fun HomeContent(
                 Text(
                     text = "မင်္ဂလာပါ 👋",
                     style = MaterialTheme.typography.displayMedium,
-                    color = TextHi
+                    color = MaterialTheme.colorScheme.onSurface
                 )
                 Text(
                     text = "ဒီနေ့ ဘာနားထောင်မလဲ?",
                     style = MaterialTheme.typography.bodyLarge,
-                    color = TextLo
+                    color = MaterialTheme.colorScheme.onSurfaceVariant
                 )
             }
         }
@@ -194,7 +183,7 @@ private fun HomeContent(
             Text(
                 text = "အမျိုးအစားများ",
                 style = MaterialTheme.typography.titleMedium,
-                color = TextHi,
+                color = MaterialTheme.colorScheme.onSurface,
                 modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp)
             )
         }

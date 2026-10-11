@@ -48,9 +48,6 @@ import com.example.myancast.ui.components.PlayerControls
 import com.example.myancast.ui.theme.GoldPrimary
 import com.example.myancast.ui.theme.LiveRed
 import com.example.myancast.ui.theme.MyanCastTheme
-import com.example.myancast.ui.theme.OutlineDark
-import com.example.myancast.ui.theme.TextHi
-import com.example.myancast.ui.theme.TextLo
 
 
 // ─────────────────────────────────────────────
@@ -183,7 +180,7 @@ private fun PlayerBody(
         Text(
             text = state.title,
             style = MaterialTheme.typography.headlineSmall,
-            color = TextHi,
+            color = MaterialTheme.colorScheme.onSurface,
             maxLines = 2,
             overflow = TextOverflow.Ellipsis,
             textAlign = TextAlign.Center,
@@ -195,7 +192,7 @@ private fun PlayerBody(
         Text(
             text = state.podcastTitle,
             style = MaterialTheme.typography.bodyMedium,
-            color = TextLo,
+            color = MaterialTheme.colorScheme.onSurfaceVariant,
             maxLines = 1,
             overflow = TextOverflow.Ellipsis,
             textAlign = TextAlign.Center,
@@ -278,7 +275,7 @@ private fun SeekBar(
             colors = SliderDefaults.colors(
                 thumbColor = GoldPrimary,
                 activeTrackColor = GoldPrimary,
-                inactiveTrackColor = OutlineDark
+                inactiveTrackColor = MaterialTheme.colorScheme.outline
             )
         )
 
@@ -291,12 +288,12 @@ private fun SeekBar(
                 text = dragFraction?.let { formatMs((state.durationMs * it).toLong()) }
                     ?: state.positionText,
                 style = MaterialTheme.typography.labelMedium,
-                color = TextLo
+                color = MaterialTheme.colorScheme.onSurfaceVariant
             )
             Text(
                 text = state.durationText,
                 style = MaterialTheme.typography.labelMedium,
-                color = TextLo
+                color = MaterialTheme.colorScheme.onSurfaceVariant
             )
         }
     }

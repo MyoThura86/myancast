@@ -23,10 +23,6 @@ import androidx.compose.ui.unit.dp
 import coil.compose.AsyncImage
 import com.example.myancast.domain.model.Podcast
 import com.example.myancast.domain.util.toMyanmarDigits
-import com.example.myancast.ui.theme.OutlineDark
-import com.example.myancast.ui.theme.SurfaceDark
-import com.example.myancast.ui.theme.TextHi
-import com.example.myancast.ui.theme.TextLo
 
 @Composable
 fun PodcastCard(
@@ -39,8 +35,8 @@ fun PodcastCard(
             .width(140.dp)
             .clickable(onClick = onClick),
         shape = RoundedCornerShape(12.dp),
-        colors = CardDefaults.cardColors(containerColor = SurfaceDark),
-        border = BorderStroke(1.dp, OutlineDark)
+        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
+        border = BorderStroke(1.dp, MaterialTheme.colorScheme.outline)
     ) {
         Column {
             AsyncImage(
@@ -56,7 +52,7 @@ fun PodcastCard(
                 Text(
                     text = podcast.title,
                     style = MaterialTheme.typography.titleSmall,
-                    color = TextHi,
+                    color = MaterialTheme.colorScheme.onSurface,
                     maxLines = 2,
                     overflow = TextOverflow.Ellipsis
                 )
@@ -64,7 +60,7 @@ fun PodcastCard(
                 Text(
                     text = "${podcast.episodeCount.toMyanmarDigits()} ပိုင်း",
                     style = MaterialTheme.typography.bodySmall,
-                    color = TextLo
+                    color = MaterialTheme.colorScheme.onSurfaceVariant
                 )
             }
         }

@@ -29,10 +29,6 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.unit.dp
 import coil.compose.AsyncImage
 import com.example.myancast.ui.theme.GoldPrimary
-import com.example.myancast.ui.theme.OutlineDark
-import com.example.myancast.ui.theme.Surface2Dark
-import com.example.myancast.ui.theme.TextHi
-import com.example.myancast.ui.theme.TextLo
 
 @Composable
 fun MiniPlayer(
@@ -41,18 +37,18 @@ fun MiniPlayer(
     coverUrl: String,
     progress: Float,
     isPlaying: Boolean,
-    hasNext: Boolean = true,
     onExpand: () -> Unit,
     onPlayPause: () -> Unit,
     onNext: () -> Unit,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    hasNext: Boolean = true
 ) {
     Surface(
         modifier = modifier
             .fillMaxWidth()
             .height(64.dp)
             .clickable(onClick = onExpand),
-        color = Surface2Dark,
+        color = MaterialTheme.colorScheme.surfaceVariant,
         shadowElevation = 8.dp
     ) {
         Column {
@@ -60,7 +56,7 @@ fun MiniPlayer(
                 progress = { progress },
                 modifier = Modifier.fillMaxWidth().height(2.dp),
                 color = GoldPrimary,
-                trackColor = OutlineDark
+                trackColor = MaterialTheme.colorScheme.outline
             )
             Row(
                 modifier = Modifier.fillMaxSize().padding(horizontal = 12.dp),
@@ -80,13 +76,13 @@ fun MiniPlayer(
                         text = title,
                         maxLines = 1,
                         style = MaterialTheme.typography.bodyMedium,
-                        color = TextHi
+                        color = MaterialTheme.colorScheme.onSurface
                     )
                     Text(
                         text = subtitle,
                         maxLines = 1,
                         style = MaterialTheme.typography.bodySmall,
-                        color = TextLo
+                        color = MaterialTheme.colorScheme.onSurfaceVariant
                     )
                 }
                 IconButton(onClick = onPlayPause) {
@@ -103,7 +99,7 @@ fun MiniPlayer(
                     Icon(
                         imageVector = Icons.Filled.SkipNext,
                         contentDescription = "Next",
-                        tint = TextHi
+                        tint = MaterialTheme.colorScheme.onSurface
                     )
                 }
             }

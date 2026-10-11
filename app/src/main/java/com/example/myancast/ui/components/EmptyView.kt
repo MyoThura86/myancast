@@ -14,11 +14,10 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.example.myancast.ui.theme.TextLo
 
 @Composable
 fun EmptyView(
-    message: String = "ဘာမှမရှိသေးပါ",
+    message: String,
     modifier: Modifier = Modifier
 ) {
     Column(
@@ -31,7 +30,7 @@ fun EmptyView(
         Text(
             text = message,
             style = MaterialTheme.typography.bodyLarge,
-            color = TextLo,
+            color = MaterialTheme.colorScheme.onSurfaceVariant,
             textAlign = TextAlign.Center
         )
     }

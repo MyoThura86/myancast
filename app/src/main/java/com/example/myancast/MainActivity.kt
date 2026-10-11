@@ -25,23 +25,6 @@ class MainActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
 
-        // ────── Test Code (ယာယီ) ──────
-//        val repo = PodcastRepositoryImpl()
-//        lifecycleScope.launch {
-//            try {
-//                repo.getEpisodes("1qkg3ipdeNz5Ue6Q5gR4")
-//                    .collect { episodes ->
-//                        Log.d("EPISODE_TEST", "Episodes: ${episodes.size}")
-//                        episodes.forEach {
-//                            Log.d("EPISODE_TEST", "- ${it.title}")
-//                        }
-//                    }
-//            } catch (e: Exception) {
-//                Log.e("EPISODE_TEST", "Error: ${e.message}", e)
-//            }
-//        }
-
-        // ────── UI ──────
         setContent {
             MyanCastRoot()
         }

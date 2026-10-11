@@ -16,9 +16,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import com.example.myancast.ui.theme.BgDark
 import com.example.myancast.ui.theme.GoldPrimary
-import com.example.myancast.ui.theme.OutlineDark
-import com.example.myancast.ui.theme.Surface2Dark
-import com.example.myancast.ui.theme.TextLo
 
 @Composable
 fun CategoryChips(
@@ -36,14 +33,14 @@ fun CategoryChips(
             val isSelected = category == selected
             Surface(
                 shape = RoundedCornerShape(50),
-                color = if (isSelected) GoldPrimary else Surface2Dark,
-                border = if (isSelected) null else BorderStroke(1.dp, OutlineDark),
+                color = if (isSelected) GoldPrimary else MaterialTheme.colorScheme.surfaceVariant,
+                border = if (isSelected) null else BorderStroke(1.dp, MaterialTheme.colorScheme.outline),
                 modifier = Modifier.clickable { onSelect(category) }
             ) {
                 Text(
                     text = category,
                     modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp),
-                    color = if (isSelected) BgDark else TextLo,
+                    color = if (isSelected) BgDark else MaterialTheme.colorScheme.onSurfaceVariant,
                     style = MaterialTheme.typography.bodyMedium
                 )
             }

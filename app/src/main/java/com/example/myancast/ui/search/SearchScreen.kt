@@ -34,8 +34,6 @@ import com.example.myancast.ui.components.ErrorView
 import com.example.myancast.ui.components.LoadingView
 import com.example.myancast.ui.components.PodcastListItem
 import com.example.myancast.ui.theme.MyanCastTheme
-import com.example.myancast.ui.theme.TextHi
-import com.example.myancast.ui.theme.TextLo
 
 
 // ─────────────────────────────────────────────
@@ -82,7 +80,7 @@ private fun SearchContent(
                     Text(
                         text = "ရှာဖွေရန်",
                         style = MaterialTheme.typography.titleLarge,
-                        color = TextHi
+                        color = MaterialTheme.colorScheme.onSurface
                     )
                 },
                 colors = TopAppBarDefaults.centerAlignedTopAppBarColors(
@@ -145,17 +143,17 @@ private fun SearchField(
                 text = "podcast အမည် / အမျိုးအစား",
                 // ★ TextField မှာ style မသတ်မှတ်ရင် Poppins ဖြစ်ပြီး မြန်မာစာ ပုံပျက်မယ်
                 style = MaterialTheme.typography.bodyLarge,
-                color = TextLo
+                color = MaterialTheme.colorScheme.onSurfaceVariant
             )
         },
         textStyle = MaterialTheme.typography.bodyLarge,
         leadingIcon = {
-            Icon(Icons.Filled.Search, contentDescription = null, tint = TextLo)
+            Icon(Icons.Filled.Search, contentDescription = null, tint = MaterialTheme.colorScheme.onSurfaceVariant)
         },
         trailingIcon = {
             if (query.isNotEmpty()) {
                 IconButton(onClick = onClear) {
-                    Icon(Icons.Filled.Close, contentDescription = "ရှင်းမည်", tint = TextLo)
+                    Icon(Icons.Filled.Close, contentDescription = "ရှင်းမည်", tint = MaterialTheme.colorScheme.onSurfaceVariant)
                 }
             }
         },

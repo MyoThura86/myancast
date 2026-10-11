@@ -24,9 +24,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import com.example.myancast.ui.theme.AppConfig
 import com.example.myancast.ui.theme.GoldPrimary
-import com.example.myancast.ui.theme.OutlineDark
-import com.example.myancast.ui.theme.TextHi
-import com.example.myancast.ui.theme.TextLo
 
 /**
  * Phase 1 ရဲ့ design system ကို လက်တွေ့ စမ်းလို့ရအောင် —
@@ -48,7 +45,7 @@ fun SettingsScreen(
                     Text(
                         text = "ဆက်တင်",
                         style = MaterialTheme.typography.titleLarge,
-                        color = TextHi
+                        color = MaterialTheme.colorScheme.onBackground
                     )
                 },
                 colors = TopAppBarDefaults.topAppBarColors(
@@ -64,25 +61,25 @@ fun SettingsScreen(
         ) {
             SettingsToggle(
                 title = "ဇော်ဂျီ စာလုံး",
-                subtitle = "Phase 5 တွင် ထည့်သွင်းမည်",
+                subtitle = "Unicode စံနှုန်းကိုသာ အသုံးပြုသည်",
                 checked = false,
                 enabled = false,
-                onCheckedChange = { /* Phase 5 — EncodingUtil.kt ကြည့် */ }
+                onCheckedChange = { /* ဆုံးဖြတ်ချက် — EncodingUtil.kt ကြည့် */ }
             )
-            HorizontalDivider(color = OutlineDark)
+            HorizontalDivider(color = MaterialTheme.colorScheme.outline)
             SettingsToggle(
                 title = "အမှောင် အပြင်အဆင်",
                 subtitle = if (config.darkMode) "အမှောင် ဖွင့်ထားသည်" else "အလင်း ဖွင့်ထားသည်",
                 checked = config.darkMode,
                 onCheckedChange = { onConfigChange(config.copy(darkMode = it)) }
             )
-            HorizontalDivider(color = OutlineDark)
+            HorizontalDivider(color = MaterialTheme.colorScheme.outline)
 
             Spacer(Modifier.height(24.dp))
             Text(
-                text = "MyanCast · ဗားရှင်း ၁.၀",
+                text = "MyanCast Personal · ဗားရှင်း ၁.၀",
                 style = MaterialTheme.typography.bodySmall,
-                color = TextLo,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
                 modifier = Modifier.padding(horizontal = 16.dp)
             )
         }
@@ -100,7 +97,7 @@ private fun SettingsToggle(
     Row(
         modifier = Modifier
             .fillMaxWidth()
-            .clickable { onCheckedChange(!checked) }
+            .clickable(enabled = enabled) { onCheckedChange(!checked) }
             .padding(horizontal = 16.dp, vertical = 14.dp),
         verticalAlignment = Alignment.CenterVertically
     ) {
@@ -108,12 +105,12 @@ private fun SettingsToggle(
             Text(
                 text = title,
                 style = MaterialTheme.typography.titleMedium,
-                color = TextHi
+                color = MaterialTheme.colorScheme.onBackground
             )
             Text(
                 text = subtitle,
                 style = MaterialTheme.typography.bodySmall,
-                color = TextLo
+                color = MaterialTheme.colorScheme.onSurfaceVariant
             )
         }
         Spacer(Modifier.width(12.dp))
@@ -125,7 +122,7 @@ private fun SettingsToggle(
                 checkedThumbColor = MaterialTheme.colorScheme.onPrimary,
                 checkedTrackColor = GoldPrimary,
                 uncheckedTrackColor = MaterialTheme.colorScheme.surfaceVariant,
-                uncheckedBorderColor = OutlineDark
+                uncheckedBorderColor = MaterialTheme.colorScheme.outline
             )
         )
     }

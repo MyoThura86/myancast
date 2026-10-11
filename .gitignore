@@ -13,3 +13,7 @@
 .externalNativeBuild
 .cxx
 local.properties
+
+# Kotlin daemon session files / per-device IDE state (accidentally committed before)
+.kotlin/
+/.idea/deploymentTargetSelector.xml

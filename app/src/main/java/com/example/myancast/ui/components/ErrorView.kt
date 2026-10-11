@@ -6,6 +6,7 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Text
@@ -17,7 +18,6 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.myancast.ui.theme.BgDark
 import com.example.myancast.ui.theme.GoldPrimary
-import com.example.myancast.ui.theme.TextLo
 
 @Composable
 fun ErrorView(
@@ -34,7 +34,7 @@ fun ErrorView(
         Spacer(Modifier.height(16.dp))
         Text(
             text = message,
-            color = TextLo,
+            color = MaterialTheme.colorScheme.onSurfaceVariant,
             textAlign = TextAlign.Center
         )
         Spacer(Modifier.height(16.dp))

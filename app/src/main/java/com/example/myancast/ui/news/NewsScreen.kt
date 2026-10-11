@@ -32,7 +32,6 @@ import com.example.myancast.ui.components.SectionHeader
 import com.example.myancast.ui.home.ALL_CATEGORY
 import com.example.myancast.ui.theme.AppConfig
 import com.example.myancast.ui.theme.MyanCastTheme
-import com.example.myancast.ui.theme.TextHi
 
 // ═══════════════════════════════════════════════
 // ၁။ Public Entry Point
@@ -75,7 +74,7 @@ private fun NewsContent(
                     Text(
                         text = "သတင်း",
                         style = MaterialTheme.typography.titleLarge,
-                        color = TextHi
+                        color = MaterialTheme.colorScheme.onSurface
                     )
                 },
                 colors = TopAppBarDefaults.centerAlignedTopAppBarColors(

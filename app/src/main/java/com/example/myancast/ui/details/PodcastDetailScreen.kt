@@ -49,6 +49,7 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import coil.compose.AsyncImage
 import com.example.myancast.domain.model.Episode
 import com.example.myancast.domain.model.Podcast
+import com.example.myancast.domain.util.toMyanmarDigits
 import com.example.myancast.ui.components.EmptyView
 import com.example.myancast.ui.components.EpisodeRow
 import com.example.myancast.ui.components.ErrorView
@@ -216,7 +217,7 @@ private fun DetailContent(
         }
 
         item {
-            SectionHeader(title = "ပိုင်းများ (${episodes.size})")
+            SectionHeader(title = "ပိုင်းများ (${episodes.size.toMyanmarDigits()})")
         }
 
         if (episodes.isEmpty()) {

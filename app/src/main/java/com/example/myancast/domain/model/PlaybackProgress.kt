@@ -1,8 +1,5 @@
 package com.example.myancast.domain.model
 
-//import android.icu.text.CaseMap
-import java.*
-
 /**
  * Episode တစ်ခုကို ဘယ်အထိ နားထောင်ထားလဲ — Room မှာ သိမ်း၊ Home နဲ့ Library မှာ ပြ။
  * Firestore နဲ့ မဆိုင်လို့ `is` prefix သုံးလို့ရတယ်။

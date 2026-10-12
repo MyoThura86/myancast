@@ -1,15 +1,17 @@
 package com.example.myancast.ui.library
 
-import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material3.CenterAlignedTopAppBar
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Tab
@@ -29,7 +31,6 @@ import com.example.myancast.ui.components.EmptyView
 import com.example.myancast.ui.components.ErrorView
 import com.example.myancast.ui.components.LoadingView
 import com.example.myancast.ui.components.PodcastListItem
-import com.example.myancast.ui.theme.TextHi
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -46,7 +47,7 @@ fun LibraryScreen(
                     Text(
                         text = "စာကြည့်တိုက်",
                         style = MaterialTheme.typography.titleLarge,
-                        color = TextHi
+                        color = MaterialTheme.colorScheme.onSurface
                     )
                 },
                 colors = TopAppBarDefaults.centerAlignedTopAppBarColors(
@@ -59,7 +60,7 @@ fun LibraryScreen(
             state.isLoading -> LoadingView(Modifier.padding(padding))
             state.error != null -> ErrorView(
                 message = state.error ?: "Error",
-                onRetry = { },
+                onRetry = vm::retry,
                 modifier = Modifier.padding(padding)
             )
             else -> LibraryContent(
@@ -104,7 +105,8 @@ private fun LibraryContent(
                 onPodcastClick = onPodcastClick
             )
             LibraryTab.HISTORY -> HistoryList(
-                history = state.history
+                history = state.history,
+                onPodcastClick = onPodcastClick
             )
         }
     }
@@ -134,7 +136,8 @@ private fun SubscribedList(
 
 @Composable
 private fun HistoryList(
-    history: List<HistoryRow>
+    history: List<HistoryRow>,
+    onPodcastClick: (String) -> Unit
 ) {
     if (history.isEmpty()) {
         EmptyView("နားထောင်ထားတာ မရှိသေးပါ")
@@ -144,23 +147,32 @@ private fun HistoryList(
             modifier = Modifier.fillMaxSize()
         ) {
             items(history) { row ->
-                HistoryItem(row = row)
+                HistoryItem(
+                    row = row,
+                    // သတင်း audio က podcast မရှိလို့ နှိပ်လို့ မရ
+                    onClick = row.podcastId.takeIf { it.isNotBlank() }
+                        ?.let { id -> { onPodcastClick(id) } }
+                )
             }
         }
     }
 }
 
 @Composable
-private fun HistoryItem(row: HistoryRow) {
-    // HistoryItem — ရိုးရှင်း
-    // (သို့) PodcastListItem ကို wrap လုပ်
-    androidx.compose.foundation.layout.Column(
-        modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp)
+private fun HistoryItem(
+    row: HistoryRow,
+    onClick: (() -> Unit)?
+) {
+    Column(
+        modifier = Modifier
+            .fillMaxWidth()
+            .then(if (onClick != null) Modifier.clickable(onClick = onClick) else Modifier)
+            .padding(horizontal = 16.dp, vertical = 8.dp)
     ) {
         Text(
             text = row.episodeTitle,
             style = MaterialTheme.typography.titleMedium,
-            color = TextHi
+            color = MaterialTheme.colorScheme.onSurface
         )
         Text(
             text = row.podcastTitle,
@@ -168,11 +180,12 @@ private fun HistoryItem(row: HistoryRow) {
             color = MaterialTheme.colorScheme.onSurfaceVariant
         )
         // Progress bar
-        androidx.compose.material3.LinearProgressIndicator(
+        LinearProgressIndicator(
             progress = { row.progress.fraction },
             modifier = Modifier
                 .padding(top = 8.dp)
-                .size(width = 200.dp, height = 3.dp)
+                .fillMaxWidth()
+                .height(3.dp)
         )
     }
 }

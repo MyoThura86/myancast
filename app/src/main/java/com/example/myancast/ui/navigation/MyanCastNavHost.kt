@@ -167,7 +167,12 @@ fun MyanCastNavHost(
                             navController.popBackStack()
                         }
                     },
-                    onEpisodeClick = { navController.navigate(Screen.Player.route) }
+                    // Episode ၂ ခါ မြန်မြန် နှိပ်ရင် Player ၂ ခု မထပ်အောင် (Phase 3 device test #15)
+                    onEpisodeClick = {
+                        navController.navigate(Screen.Player.route) {
+                            launchSingleTop = true
+                        }
+                    }
                 )
             }
 

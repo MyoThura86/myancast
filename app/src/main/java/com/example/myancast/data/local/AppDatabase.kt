@@ -7,7 +7,9 @@ import androidx.room.RoomDatabase
 
 @Database(
     entities = [LibraryEntity::class],
-    version = 2,                       // ← v1 → v2 (schema ပြောင်း)
+    // v2 → v3 — column `coverURL` → `coverUrl` (Phase 5)။ နာမည် ပြောင်းရင်လည်း schema hash
+    // ပြောင်းလို့ version မတိုးရင် Room က "cannot verify the data integrity" နဲ့ crash တယ်။
+    version = 3,
     exportSchema = false
 )
 abstract class AppDatabase : RoomDatabase() {

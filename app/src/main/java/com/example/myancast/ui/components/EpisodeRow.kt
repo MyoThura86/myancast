@@ -29,8 +29,6 @@ import com.example.myancast.domain.model.Episode
 import com.example.myancast.domain.util.formatDurationLabel
 import com.example.myancast.domain.util.formatRelativeDate
 import com.example.myancast.ui.theme.GoldPrimary
-import com.example.myancast.ui.theme.TextHi
-import com.example.myancast.ui.theme.TextLo
 
 @Composable
 fun EpisodeRow(
@@ -63,7 +61,7 @@ fun EpisodeRow(
             Text(
                 text = episode.title,
                 style = MaterialTheme.typography.titleMedium,
-                color = TextHi,
+                color = MaterialTheme.colorScheme.onSurface,
                 maxLines = 2,
                 overflow = TextOverflow.Ellipsis
             )
@@ -72,7 +70,7 @@ fun EpisodeRow(
                 Text(
                     text = meta,
                     style = MaterialTheme.typography.bodySmall,
-                    color = TextLo
+                    color = MaterialTheme.colorScheme.onSurfaceVariant
                 )
             }
         }

@@ -1,7 +1,7 @@
 package com.example.myancast.domain.util
 
 
-// ဆုံးဖြတ်ချက် (Phase 2, Member C) — Zawgyi/Unicode
+// ဆုံးဖြတ်ချက် (Phase 2 → Phase 5 Day 0 မှာ အတည်ပြု — KEEP) — Zawgyi/Unicode
 // ၁။ Firestore data အားလုံး Unicode ဖြစ်တယ်။
 //
 // ၂။ Settings မှာ Zawgyi toggle က font family ကိုပဲ ပြောင်းတယ် —
@@ -14,15 +14,13 @@ package com.example.myancast.domain.util
 //     runtime ပြောင်းရမယ် (~၁ ရက် အလုပ်)။
 //
 // ၅။ Course project အတွက် grading criteria မဟုတ်လို့ မလုပ်တော့ဘူး။
-//    အချိန်ကြာရင်လည်း မထည့်တော့ဘူး။
-// ဒါကြောင့် —
-//   • ခု Unicode ပဲ သုံးတယ်။
-//   • Settings ရဲ့ Zawgyi toggle ကို Phase 5 အထိ ပိတ်ထားတယ်
-//     (`enabled = false`, subtitle = "Phase 5 မှာထည့်မယ်")။
-//   • ဒီ file ကို Phase 5 မှာ Rabbit converter အတွက် ဖွင့်ပြန်မယ်။
+//
+// ဒါကြောင့် (နောက်ဆုံး ဆုံးဖြတ်ချက်) —
+//   • App တစ်ခုလုံး Unicode ပဲ သုံးတယ်။
+//   • Settings ရဲ့ Zawgyi toggle ကို ပိတ်ထားတယ် (`enabled = false`,
+//     subtitle = "Unicode စံနှုန်းကိုသာ အသုံးပြုသည်")။
+//   • README ရဲ့ "Known limitation" မှာ ရေးထားတယ်။
+//   • နောက်ထပ် version မှာ ထည့်မယ်ဆိုရင် — Rabbit converter ကို ဒီဖိုင်မှာ
+//     `unicodeToZawgyi()` / `zawgyiToUnicode()` အဖြစ် ထည့်ပြီး Text တွေမှာ ခေါ်ရမယ်။
 //
 // ─────────────────────────────────────────────────────────────
-
-// TODO (Phase 5): Unicode → Zawgyi converter
-// fun unicodeToZawgyi(input: String): String = TODO()
-// fun zawgyiToUnicode(input: String): String = TODO()

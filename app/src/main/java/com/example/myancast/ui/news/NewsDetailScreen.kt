@@ -46,8 +46,6 @@ import com.example.myancast.ui.theme.AppConfig
 import com.example.myancast.ui.theme.BgDark
 import com.example.myancast.ui.theme.GoldPrimary
 import com.example.myancast.ui.theme.MyanCastTheme
-import com.example.myancast.ui.theme.TextHi
-import com.example.myancast.ui.theme.TextLo
 
 // ═══════════════════════════════════════════════
 // ၁။ Public Entry Point
@@ -164,7 +162,7 @@ private fun NewsArticle(
             Text(
                 text = news.headline,
                 style = MaterialTheme.typography.displaySmall,
-                color = TextHi
+                color = MaterialTheme.colorScheme.onSurface
             )
             Spacer(Modifier.height(8.dp))
 
@@ -174,7 +172,7 @@ private fun NewsArticle(
                     .filter { it.isNotBlank() }
                     .joinToString(" · "),
                 style = MaterialTheme.typography.bodySmall,     // မြန်မာစာမို့ label* မသုံး
-                color = TextLo
+                color = MaterialTheme.colorScheme.onSurfaceVariant
             )
 
             // ─── Audio ရှိမှသာ ခလုတ် ပြ ───
@@ -203,7 +201,7 @@ private fun NewsArticle(
             Text(
                 text = news.body,
                 style = MaterialTheme.typography.bodyLarge,
-                color = TextHi
+                color = MaterialTheme.colorScheme.onSurface
             )
             Spacer(Modifier.height(24.dp))
         }

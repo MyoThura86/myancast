@@ -11,7 +11,7 @@ interface LibraryDao {
     @Query("SELECT * FROM library WHERE type = :type ORDER BY updatedAt DESC")
     fun byType(type: String): Flow<List<LibraryEntity>>
 
-    @Query("SELECT * FROM library WHERE type = 'history' ORDER BY updatedAt DESC LIMIT 20")
+    @Query("SELECT * FROM library WHERE type = 'history' ORDER BY updatedAt DESC LIMIT 1")
     fun lastPlayed(): Flow<LibraryEntity?>
 
     @Upsert

@@ -25,10 +25,6 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import coil.compose.AsyncImage
 import com.example.myancast.domain.model.NewsItem
-import com.example.myancast.ui.theme.OutlineDark
-import com.example.myancast.ui.theme.SurfaceDark
-import com.example.myancast.ui.theme.TextHi
-import com.example.myancast.ui.theme.TextLo
 
 @Composable
 fun FeaturedNewsCard(
@@ -42,8 +38,8 @@ fun FeaturedNewsCard(
             .padding(horizontal = 16.dp, vertical = 8.dp)
             .clickable(onClick = onClick),
         shape = RoundedCornerShape(16.dp),
-        colors = CardDefaults.cardColors(containerColor = SurfaceDark),
-        border = BorderStroke(1.dp, OutlineDark)
+        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
+        border = BorderStroke(1.dp, MaterialTheme.colorScheme.outline)
     ) {
         Column {
             AsyncImage(
@@ -58,7 +54,7 @@ fun FeaturedNewsCard(
                 Text(
                     text = news.headline,
                     style = MaterialTheme.typography.titleLarge,
-                    color = TextHi,
+                    color = MaterialTheme.colorScheme.onSurface,
                     maxLines = 2,
                     overflow = TextOverflow.Ellipsis
                 )
@@ -67,7 +63,7 @@ fun FeaturedNewsCard(
                     text = news.category,
                     // မြန်မာစာအပေါ် label* (Poppins) မသုံးရ — glyph မရှိလို့ ဘူးကွက် ထွက်မယ်
                     style = MaterialTheme.typography.bodySmall,
-                    color = TextLo
+                    color = MaterialTheme.colorScheme.onSurfaceVariant
                 )
             }
         }
@@ -91,7 +87,7 @@ fun NewsListItem(
             Text(
                 text = news.headline,
                 style = MaterialTheme.typography.titleMedium,
-                color = TextHi,
+                color = MaterialTheme.colorScheme.onSurface,
                 maxLines = 2,
                 overflow = TextOverflow.Ellipsis
             )
@@ -99,7 +95,7 @@ fun NewsListItem(
             Text(
                 text = news.body,
                 style = MaterialTheme.typography.bodySmall,
-                color = TextLo,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
                 maxLines = 2,
                 overflow = TextOverflow.Ellipsis
             )

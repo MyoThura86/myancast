@@ -148,6 +148,7 @@ class Media3PlayerController(context: Context) : PlayerController {
         when (c.playbackState) {
             Player.STATE_IDLE -> c.prepare()                 // error ပြီးရင် ပြန်စ
             Player.STATE_ENDED -> c.seekToDefaultPosition()  // ဆုံးသွားရင် အစက ပြန်ဖွင့်
+            else -> Unit                                     // READY / BUFFERING — play() ပဲ လို
         }
         c.play()
     }

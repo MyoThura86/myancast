@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Android 13+ themed icon — system က အရောင် ထည့်ပေးတယ်။ ▶ နဲ့ "မ" က မထိကြလို့ အရောင် ၁ မျိုးတည်းနဲ့လည်း ဖတ်လို့ရ -->
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="108dp"
+    android:height="108dp"
+    android:viewportWidth="108"
+    android:viewportHeight="108">
+    <path
+        android:pathData="M36,40 a6.5,6.5 0 1,1 13,0 a6.5,6.5 0 1,1 -13,0"
+        android:strokeColor="#FFFFFFFF"
+        android:strokeWidth="6.5" />
+    <path
+        android:pathData="M36,40 L36,56 C36,65.94 44.06,74 54,74 C63.94,74 72,65.94 72,56 L72,36"
+        android:strokeColor="#FFFFFFFF"
+        android:strokeWidth="6.5"
+        android:strokeLineCap="round"
+        android:strokeLineJoin="round" />
+    <path
+        android:pathData="M50.5,54 L50.5,66 L61.5,60 Z"
+        android:fillColor="#FFFFFFFF"
+        android:strokeColor="#FFFFFFFF"
+        android:strokeWidth="3"
+        android:strokeLineJoin="round" />
+</vector>

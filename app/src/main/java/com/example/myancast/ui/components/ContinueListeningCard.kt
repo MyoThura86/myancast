@@ -33,10 +33,6 @@ import androidx.compose.ui.unit.dp
 import coil.compose.AsyncImage
 import com.example.myancast.ui.theme.BgDark
 import com.example.myancast.ui.theme.GoldPrimary
-import com.example.myancast.ui.theme.OutlineDark
-import com.example.myancast.ui.theme.Surface2Dark
-import com.example.myancast.ui.theme.TextHi
-import com.example.myancast.ui.theme.TextLo
 
 /**
  * Home ရဲ့ "ဆက်နားထောင်ရန်" card။
@@ -65,8 +61,8 @@ fun ContinueListeningCard(
             .padding(horizontal = 16.dp)
             .clickable(onClick = onClick),
         shape = RoundedCornerShape(16.dp),
-        colors = CardDefaults.cardColors(containerColor = Surface2Dark),
-        border = BorderStroke(1.dp, OutlineDark)
+        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceVariant),
+        border = BorderStroke(1.dp, MaterialTheme.colorScheme.outline)
     ) {
         Column(Modifier.padding(12.dp)) {
             Text(
@@ -90,14 +86,14 @@ fun ContinueListeningCard(
                     Text(
                         text = title,
                         style = MaterialTheme.typography.titleMedium,
-                        color = TextHi,
+                        color = MaterialTheme.colorScheme.onSurface,
                         maxLines = 1,
                         overflow = TextOverflow.Ellipsis
                     )
                     Text(
                         text = subtitle,
                         style = MaterialTheme.typography.bodySmall,
-                        color = TextLo,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant,
                         maxLines = 1,
                         overflow = TextOverflow.Ellipsis
                     )
@@ -125,7 +121,7 @@ fun ContinueListeningCard(
                     .height(3.dp)
                     .clip(RoundedCornerShape(2.dp)),
                 color = GoldPrimary,
-                trackColor = OutlineDark
+                trackColor = MaterialTheme.colorScheme.outline
             )
         }
     }

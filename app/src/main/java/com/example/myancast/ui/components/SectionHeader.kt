@@ -34,9 +34,9 @@ fun SectionHeader(
         if (onSeeAll != null) {
             TextButton(onClick = onSeeAll) {
                 Text(
-                    text = "See all",
+                    text = "အားလုံး ကြည့်ရန်",
                     color = GoldPrimary,
-                    style = MaterialTheme.typography.labelLarge
+                    style = MaterialTheme.typography.bodyMedium   // မြန်မာစာ — label* (Poppins) မသုံးရ
                 )
             }
         }

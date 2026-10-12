@@ -2,6 +2,4 @@
 <resources>
     <!-- Compose Color.kt ရဲ့ BgDark နဲ့ တူအောင် ထားတယ် (launch flash ကာကွယ်ဖို့) -->
     <color name="bg_dark">#FF0E0D0B</color>
-    <color name="black">#FF000000</color>
-    <color name="white">#FFFFFFFF</color>
 </resources>

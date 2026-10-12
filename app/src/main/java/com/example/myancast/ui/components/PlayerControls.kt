@@ -15,6 +15,7 @@ import androidx.compose.material.icons.filled.PlayArrow
 import androidx.compose.material.icons.filled.Replay
 import androidx.compose.material.icons.filled.SkipNext
 import androidx.compose.material.icons.filled.SkipPrevious
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -25,8 +26,6 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.unit.dp
 import com.example.myancast.ui.theme.BgDark
 import com.example.myancast.ui.theme.GoldPrimary
-import com.example.myancast.ui.theme.TextHi
-import com.example.myancast.ui.theme.TextLo
 
 @Composable
 fun PlayerControls(
@@ -50,7 +49,7 @@ fun PlayerControls(
             Icon(
                 Icons.Filled.Replay,
                 contentDescription = "နောက်ပြန် ၁၅ စက္ကန့်",
-                tint = TextHi,
+                tint = MaterialTheme.colorScheme.onSurface,
                 modifier = Modifier.size(28.dp)
             )
         }
@@ -58,7 +57,7 @@ fun PlayerControls(
             Icon(
                 Icons.Filled.SkipPrevious,
                 contentDescription = "ယခင် အပိုင်း",
-                tint = if (hasPrevious) TextHi else TextLo,
+                tint = if (hasPrevious) MaterialTheme.colorScheme.onSurface else MaterialTheme.colorScheme.onSurfaceVariant,
                 modifier = Modifier.size(36.dp)
             )
         }
@@ -90,7 +89,7 @@ fun PlayerControls(
             Icon(
                 Icons.Filled.SkipNext,
                 contentDescription = "နောက် အပိုင်း",
-                tint = if (hasNext) TextHi else TextLo,
+                tint = if (hasNext) MaterialTheme.colorScheme.onSurface else MaterialTheme.colorScheme.onSurfaceVariant,
                 modifier = Modifier.size(36.dp)
             )
         }
@@ -98,7 +97,7 @@ fun PlayerControls(
             Icon(
                 Icons.AutoMirrored.Filled.Forward,
                 contentDescription = "ရှေ့ ၃၀ စက္ကန့်",
-                tint = TextHi,
+                tint = MaterialTheme.colorScheme.onSurface,
                 modifier = Modifier.size(28.dp)
             )
         }

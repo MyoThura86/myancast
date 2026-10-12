@@ -1,6 +1,7 @@
 // data/firebase/FirestoreExt.kt
 package com.example.myancast.data.firebase
 
+import android.util.Log
 import com.google.firebase.firestore.DocumentSnapshot
 import com.google.firebase.firestore.Query
 import com.google.firebase.firestore.QuerySnapshot
@@ -8,12 +9,21 @@ import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.callbackFlow
 
+// Console မှာ field type မှားထည့်ထားတဲ့ document (ဥပမာ episodeCount ကို string) တစ်ခုကြောင့်
+// app တစ်ခုလုံး crash မဖြစ်အောင် အဲဒီ document ကိုပဲ ကျော်ပြီး log ထုတ်မယ်
 fun <T : Any> QuerySnapshot.toListWithIds(
     clazz: Class<T>,
     withId: (T, String) -> T
 ): List<T> = documents.mapNotNull { doc ->
-    doc.toObject(clazz)?.let { withId(it, doc.id) }
+    try {
+        doc.toObject(clazz)?.let { withId(it, doc.id) }
+    } catch (e: RuntimeException) {
+        Log.w(TAG, "Skipping ${doc.reference.path}: ${e.message}")
+        null
+    }
 }
+
+private const val TAG = "FirestoreExt"
 
 fun <T : Any> DocumentSnapshot.toObjectWithId(
     clazz: Class<T>,

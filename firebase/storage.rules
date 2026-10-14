@@ -1,0 +1,44 @@
+rules_version = '2';
+
+// MyanCast — Cloud Storage Security Rules (Phase 6 · Admin panel)
+//
+// • ပုံ/MP3 ကို အသုံးပြုသူ အားလုံး ဖတ်လို့ရ (app က download URL နဲ့ ဖွင့်)
+// • တင်ခွင့်/ဖျက်ခွင့် — Admin အကောင့် (admin@myancast.app) တစ်ခုတည်း
+// • ပုံ = image/* (5 MB အောက်) · အသံ = audio/mpeg (MP3, 300 MB အောက်)
+//
+// Firebase Console → Storage → Rules မှာ ဒီဖိုင် တစ်ခုလုံး ကူးထည့်ပြီး Publish နှိပ်ပါ။
+
+service firebase.storage {
+  match /b/{bucket}/o {
+
+    function isAdmin() {
+      return request.auth != null
+        && request.auth.token.email == 'admin@myancast.app'
+        && request.auth.token.firebase.sign_in_provider == 'password';
+    }
+
+    function isImage() {
+      return request.resource.contentType.matches('image/.*')
+        && request.resource.size < 5 * 1024 * 1024;
+    }
+
+    function isMp3() {
+      return request.resource.contentType == 'audio/mpeg'
+        && request.resource.size < 300 * 1024 * 1024;
+    }
+
+    // Podcast မျက်နှာဖုံး — podcasts/<podcastId>/cover_<time>.jpg
+    match /podcasts/{podcastId}/{fileName} {
+      allow read: if true;
+      allow create, update: if isAdmin() && isImage();
+      allow delete: if isAdmin();
+    }
+
+    // အပိုင်း ပုံ နဲ့ MP3 — episodes/<episodeId>/cover_<time>.jpg · audio_<time>.mp3
+    match /episodes/{episodeId}/{fileName} {
+      allow read: if true;
+      allow create, update: if isAdmin() && (isImage() || isMp3());
+      allow delete: if isAdmin();
+    }
+  }
+}

@@ -2,18 +2,26 @@
 package com.example.myancast.ui.news
 
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.ViewModelProvider.AndroidViewModelFactory.Companion.APPLICATION_KEY
 import androidx.lifecycle.viewModelScope
 import androidx.lifecycle.viewmodel.initializer
 import androidx.lifecycle.viewmodel.viewModelFactory
+import com.example.myancast.MyanCastApp
+import com.example.myancast.data.network.AlwaysOnlineNetworkMonitor
+import com.example.myancast.data.network.NetworkMonitor
 import com.example.myancast.data.repository.FirestoreNewsRepository
 import com.example.myancast.data.repository.NewsRepository
 import com.example.myancast.domain.model.NewsItem
+import com.example.myancast.ui.components.offlineErrorOrNull
 import com.example.myancast.ui.home.ALL_CATEGORY
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.catch
+import kotlinx.coroutines.flow.distinctUntilChanged
+import kotlinx.coroutines.flow.drop
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 
@@ -39,7 +47,8 @@ data class NewsUiState(
 // VIEWMODEL
 // ═══════════════════════════════════════════════
 class NewsViewModel(
-    private val repo: NewsRepository
+    private val repo: NewsRepository,
+    private val network: NetworkMonitor = AlwaysOnlineNetworkMonitor()
 ) : ViewModel() {
 
     private val _state = MutableStateFlow(NewsUiState())
@@ -49,6 +58,7 @@ class NewsViewModel(
 
     init {
         loadNews()
+        observeNetwork()
     }
 
     // ─── Load ───────────────────────────────────
@@ -72,9 +82,24 @@ class NewsViewModel(
                             categories = buildNewsCategories(list),
                             news = filterNews(list, current.selectedCategory),
                             isLoading = false,
-                            error = null
+                            // ★ Phase 6 (#2) — offline + cache အလွတ် = error
+                            error = offlineErrorOrNull(list.isEmpty(), network.status.value.online)
                         )
                     }
+                }
+        }
+    }
+
+    /** ★ Phase 6 (#2) — လိုင်း ပြန်ရလာရင် အလိုအလျောက် ပြန်ဆွဲ */
+    private fun observeNetwork() {
+        viewModelScope.launch {
+            network.status
+                .map { it.online }
+                .distinctUntilChanged()
+                .drop(1)
+                .collect { online ->
+                    val current = _state.value
+                    if (online && (current.error != null || current.allNews.isEmpty())) refresh()
                 }
         }
     }
@@ -99,7 +124,10 @@ class NewsViewModel(
         fun factory(
             repo: NewsRepository = FirestoreNewsRepository()
         ) = viewModelFactory {
-            initializer { NewsViewModel(repo) }
+            initializer {
+                val app = this[APPLICATION_KEY] as MyanCastApp
+                NewsViewModel(repo, app.networkMonitor)
+            }
         }
     }
 }

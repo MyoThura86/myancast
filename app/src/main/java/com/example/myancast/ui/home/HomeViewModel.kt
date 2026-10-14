@@ -9,11 +9,14 @@ import androidx.lifecycle.viewmodel.viewModelFactory
 import com.example.myancast.MyanCastApp
 import com.example.myancast.data.repository.LibraryRepository
 import com.example.myancast.data.repository.PodcastRepository
+import com.example.myancast.data.network.AlwaysOnlineNetworkMonitor
+import com.example.myancast.data.network.NetworkMonitor
 import com.example.myancast.data.repository.PodcastRepositoryImpl
 import com.example.myancast.domain.model.PlaybackProgress
 import com.example.myancast.domain.model.Podcast
 import com.example.myancast.player.PlayerController
 import com.example.myancast.player.PlayerQueue
+import com.example.myancast.ui.components.offlineErrorOrNull
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -21,6 +24,7 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.distinctUntilChanged
+import kotlinx.coroutines.flow.drop
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.update
@@ -55,7 +59,8 @@ data class HomeUiState(
 class HomeViewModel(
     private val repo: PodcastRepository,
     private val libraryRepo: LibraryRepository,
-    private val player: PlayerController
+    private val player: PlayerController,
+    private val network: NetworkMonitor = AlwaysOnlineNetworkMonitor()
 ) : ViewModel() {
 
     private val _state = MutableStateFlow(HomeUiState())
@@ -69,6 +74,7 @@ class HomeViewModel(
         loadPodcasts()
         observeLastPlayed()
         observePlayback()
+        observeNetwork()
     }
 
     // ─── Load ───────────────────────────────────
@@ -93,7 +99,8 @@ class HomeViewModel(
                             categories = buildCategories(list),
                             podcasts = filterByCategory(list, current.selectedCategory),
                             isLoading = false,
-                            error = null
+                            // ★ Phase 6 (#2) — offline + cache အလွတ် = error ("data မရှိ" မဟုတ်)
+                            error = offlineErrorOrNull(list.isEmpty(), network.status.value.online)
                         )
                     }
                 }
@@ -129,6 +136,20 @@ class HomeViewModel(
                 .distinctUntilChanged()
                 .collect { episodeId ->
                     _state.update { it.copy(playingEpisodeId = episodeId) }
+                }
+        }
+    }
+
+    /** ★ Phase 6 (#2) — လိုင်း ပြန်ရလာရင် error/အလွတ် ဖြစ်နေတာကို အလိုအလျောက် ပြန်ဆွဲ */
+    private fun observeNetwork() {
+        viewModelScope.launch {
+            network.status
+                .map { it.online }
+                .distinctUntilChanged()
+                .drop(1)                      // စဖွင့်ချိန် တန်ဖိုး — ပြောင်းလဲမှု မဟုတ်
+                .collect { online ->
+                    val current = _state.value
+                    if (online && (current.error != null || current.allPodcasts.isEmpty())) refresh()
                 }
         }
     }
@@ -209,7 +230,7 @@ class HomeViewModel(
         ) = viewModelFactory {
             initializer {
                 val app = this[APPLICATION_KEY] as MyanCastApp
-                HomeViewModel(repo, app.libraryRepository, app.playerController)
+                HomeViewModel(repo, app.libraryRepository, app.playerController, app.networkMonitor)
             }
         }
     }

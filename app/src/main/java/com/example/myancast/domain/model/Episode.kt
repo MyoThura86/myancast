@@ -10,7 +10,9 @@ data class Episode(
     val audioUrl: String = "",
     val duration: Int = 0,
     val publishedAt: Timestamp? = null,
-    val coverUrl: String = ""
+    val coverUrl: String = "",
+    /** ★ Phase 6 — MP3 ဖိုင် အရွယ် (byte) · 0 = မသိ (Console က ထည့်ထားတဲ့ data အဟောင်း) */
+    val fileSizeBytes: Long = 0L
 ) {
     val formattedDuration: String
         get() {

@@ -1,6 +1,7 @@
 package com.example.myancast
 
 import com.example.myancast.domain.model.PlaybackState
+import com.example.myancast.domain.model.SleepTimerOption
 import com.example.myancast.player.PlayerController
 import com.example.myancast.player.PlayerQueue
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -79,6 +80,21 @@ class FakePlayerController(
     override fun setSpeed(speed: Float) {
         lastSpeed = speed
         _state.update { it.copy(speed = speed) }
+    }
+
+    /** ★ Phase 6 (#3) — နောက်ဆုံး ရွေးခဲ့တဲ့ sleep timer */
+    var lastSleepTimer: SleepTimerOption? = null
+        private set
+
+    override fun setSleepTimer(option: SleepTimerOption) {
+        lastSleepTimer = option
+        _state.update {
+            when (option) {
+                SleepTimerOption.Off -> it.copy(sleepTimerEndsAtMs = null, sleepAtEpisodeEnd = false)
+                is SleepTimerOption.Minutes -> it.copy(sleepTimerEndsAtMs = option.minutes * 60_000L, sleepAtEpisodeEnd = false)
+                SleepTimerOption.EndOfEpisode -> it.copy(sleepTimerEndsAtMs = null, sleepAtEpisodeEnd = true)
+            }
+        }
     }
 
     // ★ Test အတွက် helper — state ကို ပြောင်း

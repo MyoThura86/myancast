@@ -19,6 +19,7 @@ import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Check
 import androidx.compose.material.icons.filled.PlayArrow
+import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
@@ -29,6 +30,7 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
@@ -49,12 +51,16 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import coil.compose.AsyncImage
 import com.example.myancast.domain.model.Episode
 import com.example.myancast.domain.model.Podcast
+import com.example.myancast.domain.util.formatMegabytes
 import com.example.myancast.domain.util.toMyanmarDigits
+import com.example.myancast.ui.components.DownloadButtonState
 import com.example.myancast.ui.components.EmptyView
 import com.example.myancast.ui.components.EpisodeRow
 import com.example.myancast.ui.components.ErrorView
 import com.example.myancast.ui.components.LoadingView
 import com.example.myancast.ui.components.SectionHeader
+import com.example.myancast.ui.theme.GoldPrimary
+import com.example.myancast.ui.theme.LiveRed
 import com.example.myancast.ui.theme.MyanCastTheme
 
 
@@ -76,6 +82,7 @@ fun PodcastDetailScreen(
     val state by vm.state.collectAsStateWithLifecycle()
     val nowPlayingId by vm.nowPlayingId.collectAsStateWithLifecycle()
     val isSubscribed by vm.isSubscribed.collectAsStateWithLifecycle()
+    val downloadStates by vm.downloadStates.collectAsStateWithLifecycle()
 
     PodcastDetailContent(
         state = state,
@@ -87,7 +94,77 @@ fun PodcastDetailScreen(
         onPlayAll = { vm.playAll() },
         onRetry = vm::retry,
         onPlayErrorShown = vm::playErrorShown,
-        modifier = modifier
+        modifier = modifier,
+        downloadStates = downloadStates,
+        onDownloadClick = vm::onDownloadClick,
+        onMessageShown = vm::messageShown
+    )
+
+    // ★ Phase 6 (#5) — Data ချွေတာ mode + mobile data
+    state.pendingStream?.let { pending ->
+        StreamConfirmDialog(
+            pending = pending,
+            onConfirm = { if (vm.confirmStream()) onEpisodeClick(pending.episodeId.orEmpty()) },
+            onDismiss = vm::dismissStream
+        )
+    }
+    // ★ Phase 6 (#4)
+    state.confirmDeleteDownload?.let { episode ->
+        AlertDialog(
+            onDismissRequest = vm::dismissDeleteDownload,
+            title = { Text("ဒေါင်းလုဒ် ဖျက်မလား?", style = MaterialTheme.typography.titleLarge) },
+            text = {
+                Text(
+                    text = "“${episode.title}” ကို ဖုန်းထဲက ဖျက်ပါမယ်။ နောက်မှ ပြန်ဒေါင်းလို့ရပါတယ်။",
+                    style = MaterialTheme.typography.bodyMedium
+                )
+            },
+            confirmButton = {
+                TextButton(onClick = vm::confirmDeleteDownload) {
+                    Text("ဖျက်မည်", style = MaterialTheme.typography.bodyMedium, color = LiveRed)
+                }
+            },
+            dismissButton = {
+                TextButton(onClick = vm::dismissDeleteDownload) {
+                    Text("မလုပ်တော့ပါ", style = MaterialTheme.typography.bodyMedium)
+                }
+            }
+        )
+    }
+}
+
+@Composable
+private fun StreamConfirmDialog(
+    pending: PendingStream,
+    onConfirm: () -> Unit,
+    onDismiss: () -> Unit
+) {
+    val size = formatMegabytes(pending.sizeBytes)
+    AlertDialog(
+        onDismissRequest = onDismiss,
+        title = { Text("Mobile data နဲ့ ဖွင့်မလား?", style = MaterialTheme.typography.titleLarge) },
+        text = {
+            Text(
+                text = when {
+                    pending.episodeId == null ->
+                        "ဒေါင်းလုဒ် မလုပ်ရသေးတဲ့ အပိုင်းတွေကို mobile data နဲ့ ဖွင့်ပါမယ်။"
+                    size.isNotEmpty() ->
+                        "ဒီအပိုင်းကို ဒေါင်းလုဒ် မလုပ်ရသေးပါ။ နားထောင်ရင် mobile data $size ခန့် ကုန်ပါမယ်။"
+                    else -> "ဒီအပိုင်းကို ဒေါင်းလုဒ် မလုပ်ရသေးပါ။ နားထောင်ရင် mobile data ကုန်ပါမယ်။"
+                },
+                style = MaterialTheme.typography.bodyMedium
+            )
+        },
+        confirmButton = {
+            TextButton(onClick = onConfirm) {
+                Text("ဖွင့်မည်", style = MaterialTheme.typography.bodyMedium, color = GoldPrimary)
+            }
+        },
+        dismissButton = {
+            TextButton(onClick = onDismiss) {
+                Text("မဖွင့်တော့ပါ", style = MaterialTheme.typography.bodyMedium)
+            }
+        }
     )
 }
 
@@ -108,7 +185,10 @@ private fun PodcastDetailContent(
     isSubscribed: Boolean = false,
     onToggleSubscribe: () -> Unit = {},
     onPlayAll: () -> Unit = {},
-    onPlayErrorShown: () -> Unit = {}
+    onPlayErrorShown: () -> Unit = {},
+    downloadStates: Map<String, DownloadButtonState> = emptyMap(),
+    onDownloadClick: (String) -> Unit = {},
+    onMessageShown: () -> Unit = {}
 ) {
     val snackbarHostState = remember { SnackbarHostState() }
 
@@ -116,6 +196,11 @@ private fun PodcastDetailContent(
         val message = state.playError ?: return@LaunchedEffect
         snackbarHostState.showSnackbar(message)
         onPlayErrorShown()
+    }
+    LaunchedEffect(state.message) {
+        val message = state.message ?: return@LaunchedEffect
+        snackbarHostState.showSnackbar(message)
+        onMessageShown()
     }
 
     Scaffold(
@@ -177,7 +262,9 @@ private fun PodcastDetailContent(
                     onToggleSubscribe = onToggleSubscribe,
                     modifier = Modifier.padding(padding),
                     nowPlayingId = nowPlayingId,
-                    onPlayAll = onPlayAll
+                    onPlayAll = onPlayAll,
+                    downloadStates = downloadStates,
+                    onDownloadClick = onDownloadClick
                 )
             }
         }
@@ -198,7 +285,9 @@ private fun DetailContent(
     onToggleSubscribe: () -> Unit,
     modifier: Modifier = Modifier,
     nowPlayingId: String? = null,
-    onPlayAll: () -> Unit = {}
+    onPlayAll: () -> Unit = {},
+    downloadStates: Map<String, DownloadButtonState> = emptyMap(),
+    onDownloadClick: (String) -> Unit = {}
 ) {
     LazyColumn(
         modifier = modifier.fillMaxSize(),
@@ -230,7 +319,11 @@ private fun DetailContent(
                     index = i + 1,
                     episode = ep,
                     onPlay = { onEpisodeClick(ep.id) },
-                    isPlaying = ep.id == nowPlayingId
+                    isPlaying = ep.id == nowPlayingId,
+                    // audio မရှိတဲ့ အပိုင်းကို ဒေါင်းလို့ မရ — ခလုတ် မပြ
+                    downloadState = if (ep.audioUrl.isBlank()) null
+                    else downloadStates[ep.id] ?: DownloadButtonState.NotDownloaded,
+                    onDownloadClick = { onDownloadClick(ep.id) }
                 )
             }
         }
@@ -274,7 +367,7 @@ private fun PodcastHeader(
         Spacer(Modifier.height(4.dp))
 
         Text(
-            text = "${podcast.category} · ${podcast.episodeCount} ပိုင်း",
+            text = "${podcast.category} · ${podcast.episodeCount.toMyanmarDigits()} ပိုင်း",
             style = MaterialTheme.typography.bodySmall,
             color = MaterialTheme.colorScheme.onSurfaceVariant
         )

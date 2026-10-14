@@ -7,7 +7,9 @@ import androidx.lifecycle.viewmodel.initializer
 import androidx.lifecycle.viewmodel.viewModelFactory
 import com.example.myancast.MyanCastApp
 import com.example.myancast.domain.model.PlaybackState
+import com.example.myancast.domain.model.SleepTimerOption
 import com.example.myancast.domain.util.formatDuration
+import com.example.myancast.domain.util.sleepTimerLabel
 import com.example.myancast.player.PlayerController
 import com.example.myancast.player.nextSpeed
 import kotlinx.coroutines.flow.SharingStarted
@@ -38,11 +40,19 @@ data class PlayerUiState(
     val speedText: String = "1x",
     val hasNext: Boolean = false,
     val hasPrevious: Boolean = false,
-    val error: String? = null
-)
+    val error: String? = null,
+    // ★ Phase 6 (#3)
+    val sleepTimerLabel: String = "",            // "၁၂ မိနစ် ကျန်" · "" = timer မရှိ
+    val sleepAtEpisodeEnd: Boolean = false
+) {
+    val sleepTimerActive: Boolean get() = sleepTimerLabel.isNotEmpty()
+}
 
-/** Pure mapping — coroutine မလို၊ JVM ပေါ်မှာ test လို့ရ */
-fun PlaybackState.toUiState(): PlayerUiState {
+/**
+ * Pure mapping — coroutine မလို၊ JVM ပေါ်မှာ test လို့ရ
+ * @param nowMs sleep timer "ကျန်ချိန်" တွက်ဖို့ (test မှာ ပုံသေ ထား)
+ */
+fun PlaybackState.toUiState(nowMs: Long = System.currentTimeMillis()): PlayerUiState {
     val episode = currentEpisode ?: return PlayerUiState(speedText = formatSpeed(speed))
 
     // Stream က duration နောက်မှ ပေး — မသိသေးရင် Firestore ရဲ့ episode.duration (စက္ကန့်) ကို သုံး
@@ -63,7 +73,9 @@ fun PlaybackState.toUiState(): PlayerUiState {
         speedText = formatSpeed(speed),
         hasNext = hasNext,
         hasPrevious = hasPrevious,
-        error = error
+        error = error,
+        sleepTimerLabel = sleepTimerLabel(sleepTimerEndsAtMs, sleepAtEpisodeEnd, nowMs),
+        sleepAtEpisodeEnd = sleepAtEpisodeEnd
     )
 }
 
@@ -106,6 +118,9 @@ class PlayerViewModel(
         if (total <= 0) return
         controller.seekTo((total * fraction.coerceIn(0f, 1f)).toLong())
     }
+
+    /** ★ Phase 6 (#3) — 🌙 menu */
+    fun setSleepTimer(option: SleepTimerOption) = controller.setSleepTimer(option)
 
     /** 0.5 → 0.75 → 1 → 1.25 → 1.5 → 2 → 0.5 */
     fun cycleSpeed() {

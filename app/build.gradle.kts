@@ -62,6 +62,8 @@ dependencies {
 
     implementation(platform(libs.firebase.bom))
     implementation(libs.firebase.firestore.ktx)
+    implementation(libs.firebase.auth)          // ★ Phase 6 — Admin login
+    implementation(libs.firebase.storage)       // ★ Phase 6 — Admin ပုံ/MP3 တင်
 
     implementation(libs.androidx.media3.exoplayer)
     implementation(libs.androidx.media3.ui)
@@ -73,6 +75,7 @@ dependencies {
 
     implementation(libs.kotlinx.coroutines.android)
     implementation(libs.coil.compose)
+    implementation(libs.androidx.work.runtime.ktx)   // ★ Phase 6 (#4) — ဒေါင်းလုဒ် (Wi-Fi only · resume)
 
     testImplementation(libs.junit)
     testImplementation(libs.kotlinx.coroutines.test)

@@ -1,0 +1,75 @@
+rules_version = '2';
+
+// MyanCast — Cloud Firestore Security Rules (Phase 6 · Admin panel)
+//
+// • အသုံးပြုသူ အားလုံး — ဖတ်ခွင့် (login မလို၊ အရင်အတိုင်း)
+// • ရေးခွင့် — Admin အကောင့် (admin@myancast.app, Email/Password) တစ်ခုတည်း
+// • Field type စစ်တယ် — app က ဖတ်လို့ မရတဲ့ data (duration ကို စာသား စသည်) ဝင်မလာအောင်
+//
+// Firebase Console → Firestore Database → Rules မှာ ဒီဖိုင် တစ်ခုလုံး ကူးထည့်ပြီး Publish နှိပ်ပါ။
+// Admin email ကို ပြောင်းရင် app ရဲ့ AdminConfig.EMAIL နဲ့ storage.rules ကိုပါ ပြောင်းပါ။
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    function isAdmin() {
+      return request.auth != null
+        && request.auth.token.email == 'admin@myancast.app'
+        && request.auth.token.firebase.sign_in_provider == 'password';
+    }
+
+    function optionalString(data, field) {
+      return !(field in data) || data[field] is string;
+    }
+
+    // Console က ထည့်ခဲ့တဲ့ ကိန်းဂဏန်း (int/double) နှစ်မျိုးလုံး လက်ခံ — admin ကတော့ int ပဲ ရေး
+    function optionalNumber(data, field) {
+      return !(field in data) || data[field] is number;
+    }
+
+    function optionalTimestamp(data, field) {
+      return !(field in data) || data[field] is timestamp;
+    }
+
+    function validTitle(data) {
+      return data.title is string && data.title.size() > 0 && data.title.size() <= 200;
+    }
+
+    function validPodcast(data) {
+      return validTitle(data)
+        && optionalString(data, 'description')
+        && optionalString(data, 'coverUrl')
+        && optionalString(data, 'category')
+        && optionalNumber(data, 'episodeCount')
+        && optionalTimestamp(data, 'updatedAt');
+    }
+
+    function validEpisode(data) {
+      return validTitle(data)
+        && data.podcastId is string && data.podcastId.size() > 0
+        && data.audioUrl is string && data.audioUrl.matches('https?://.+')
+        && data.duration is number && data.duration > 0
+        && data.publishedAt is timestamp
+        && optionalString(data, 'description')
+        && optionalString(data, 'coverUrl')
+        && optionalNumber(data, 'fileSizeBytes');
+    }
+
+    match /podcasts/{podcastId} {
+      allow read: if true;
+      allow create, update: if isAdmin() && validPodcast(request.resource.data);
+      allow delete: if isAdmin();
+    }
+
+    match /episodes/{episodeId} {
+      allow read: if true;
+      allow create, update: if isAdmin() && validEpisode(request.resource.data);
+      allow delete: if isAdmin();
+    }
+
+    match /news/{newsId} {
+      allow read: if true;
+      allow write: if isAdmin();
+    }
+  }
+}

@@ -26,7 +26,9 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import coil.compose.AsyncImage
 import com.example.myancast.domain.model.Episode
+import com.example.myancast.domain.util.estimatedSizeBytes
 import com.example.myancast.domain.util.formatDurationLabel
+import com.example.myancast.domain.util.formatMegabytes
 import com.example.myancast.domain.util.formatRelativeDate
 import com.example.myancast.ui.theme.GoldPrimary
 
@@ -36,11 +38,16 @@ fun EpisodeRow(
     episode: Episode,
     onPlay: () -> Unit,
     modifier: Modifier = Modifier,
-    isPlaying: Boolean = false
+    isPlaying: Boolean = false,
+    /** ★ Phase 6 (#4) — null ဆို ဒေါင်းလုဒ် ခလုတ် မပြ */
+    downloadState: DownloadButtonState? = null,
+    onDownloadClick: () -> Unit = {}
 ) {
     // duration == 0 / publishedAt == null ဆိုရင် "" ပြန်လာ → အဲ့အပိုင်း မပြ
+    // ★ Phase 6 (#5) — "၂၄ မိနစ် · ~၁၂ MB · ၅ ရက် အရင်က" (data ဘယ်လောက် ကုန်မလဲ ကြိုသိ)
     val meta = listOf(
         formatDurationLabel(episode.duration),
+        formatMegabytes(episode.estimatedSizeBytes()),
         formatRelativeDate(episode.publishedAt)
     ).filter { it.isNotBlank() }.joinToString(" · ")
 
@@ -75,6 +82,9 @@ fun EpisodeRow(
             }
         }
         Spacer(Modifier.width(8.dp))
+        if (downloadState != null) {
+            DownloadButton(state = downloadState, onClick = onDownloadClick)
+        }
         IconButton(onClick = onPlay) {
             Icon(
                 imageVector = if (isPlaying) Icons.Filled.Pause else Icons.Filled.PlayCircle,

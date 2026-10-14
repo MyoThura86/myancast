@@ -10,10 +10,9 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.saveable.rememberSaveable
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.compose.rememberNavController
 import com.example.myancast.ui.navigation.MyanCastNavHost
 import com.example.myancast.ui.theme.AppConfig
@@ -33,20 +32,17 @@ class MainActivity : ComponentActivity() {
 
 @Composable
 private fun MyanCastRoot() {
-    var config by rememberSaveable(stateSaver = AppConfig.Saver) {
-        mutableStateOf(AppConfig(zawgyi = false, darkMode = true))
-    }
+    // ★ Phase 6 (#1) — SharedPreferences ထဲ သိမ်းထားတဲ့ setting — app ပိတ်ပြီး ပြန်ဖွင့်လည်း မပျောက်
+    val app = LocalContext.current.applicationContext as MyanCastApp
+    val settings by app.settingsRepository.settings.collectAsStateWithLifecycle()
+    val config = AppConfig(zawgyi = false, darkMode = settings.darkMode)
 
     MyanCastTheme(config = config) {
         Surface(
             modifier = Modifier.fillMaxSize(),
             color = MaterialTheme.colorScheme.background
         ) {
-            MyanCastNavHost(
-                navController = rememberNavController(),
-                config = config,
-                onConfigChange = { config = it }
-            )
+            MyanCastNavHost(navController = rememberNavController())
         }
     }
 }

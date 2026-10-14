@@ -13,6 +13,7 @@ import androidx.media3.session.MediaController
 import androidx.media3.session.SessionToken
 import com.example.myancast.domain.model.Episode
 import com.example.myancast.domain.model.PlaybackState
+import com.example.myancast.domain.model.SleepTimerOption
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
@@ -24,13 +25,18 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
+import java.io.File
 
 /**
  * PlayerController ရဲ့ တကယ့် implementation — PlaybackService ထဲက ExoPlayer ကို
  * MediaController နဲ့ ထိန်းပြီး Player event တွေကို PlaybackState အဖြစ် ပြောင်းပေးတယ်။
  * App တစ်ခုလုံးမှာ တစ်ခုတည်း (MyanCastApp.playerController) — main thread ပေါ်မှာပဲ သုံး။
  */
-class Media3PlayerController(context: Context) : PlayerController {
+class Media3PlayerController(
+    context: Context,
+    /** ★ Phase 6 (#4) — episodeId → ဒေါင်းထားတဲ့ ဖိုင် path (မရှိရင် null → stream) */
+    private val localAudioPath: (String) -> String? = { null }
+) : PlayerController {
 
     private val appContext = context.applicationContext
     private val scope = CoroutineScope(SupervisorJob() + Dispatchers.Main.immediate)
@@ -60,7 +66,25 @@ class Media3PlayerController(context: Context) : PlayerController {
         override fun onEvents(player: Player, events: Player.Events) {
             syncState(player)
         }
+
+        // ★ Phase 6 (#3) — "ဒီပိုင်း ဆုံးရင်" · MediaController မှာ setPauseAtEndOfMediaItems မရှိလို့
+        // နောက်ပိုင်းကို အလိုအလျောက် ကူးတဲ့ အချိန် (AUTO) မှာ pause — နောက်ပိုင်းရဲ့ ၀:၀၀ မှာ ရပ်နေမယ်
+        override fun onMediaItemTransition(mediaItem: MediaItem?, reason: Int) {
+            if (reason == Player.MEDIA_ITEM_TRANSITION_REASON_AUTO && _state.value.sleepAtEpisodeEnd) {
+                controller?.pause()
+                _state.update { it.copy(sleepAtEpisodeEnd = false) }
+            }
+        }
+
+        override fun onPlaybackStateChanged(playbackState: Int) {
+            // Queue ရဲ့ နောက်ဆုံး ပိုင်း ဆုံးရင် player ကိုယ်တိုင် ရပ်ပြီးသား — flag ပဲ ရှင်း
+            if (playbackState == Player.STATE_ENDED && _state.value.sleepAtEpisodeEnd) {
+                _state.update { it.copy(sleepAtEpisodeEnd = false) }
+            }
+        }
     }
+
+    private var sleepJob: Job? = null
 
     /** ချိတ်နေတုန်းလား — တစ်ပြိုင်တည်း ၂ ခါ မချိတ်မိအောင် */
     private var connecting = false
@@ -183,6 +207,46 @@ class Media3PlayerController(context: Context) : PlayerController {
         controller?.setPlaybackSpeed(speed)
     }
 
+    override fun setSleepTimer(option: SleepTimerOption) {
+        sleepJob?.cancel()          // fade နေတုန်း ဖျက်ရင် finally က volume ပြန်ထား
+        sleepJob = null
+        when (option) {
+            SleepTimerOption.Off ->
+                _state.update { it.copy(sleepTimerEndsAtMs = null, sleepAtEpisodeEnd = false) }
+
+            is SleepTimerOption.Minutes -> {
+                val durationMs = option.minutes * 60_000L
+                _state.update {
+                    it.copy(sleepTimerEndsAtMs = System.currentTimeMillis() + durationMs, sleepAtEpisodeEnd = false)
+                }
+                sleepJob = scope.launch {
+                    delay(durationMs)
+                    fadeOutAndPause()
+                }
+            }
+
+            SleepTimerOption.EndOfEpisode ->
+                _state.update { it.copy(sleepTimerEndsAtMs = null, sleepAtEpisodeEnd = true) }
+        }
+    }
+
+    /** ၁၀ စက္ကန့် အတွင်း အသံ တဖြည်းဖြည်း လျှော့ → pause → volume ပြန်ထား (မထားရင် နောက်တစ်ခါ အသံ မထွက်) */
+    private suspend fun fadeOutAndPause() {
+        val c = controller
+        try {
+            if (c != null && c.isPlaying) {
+                for (step in FADE_STEPS downTo 1) {
+                    c.volume = step.toFloat() / FADE_STEPS
+                    delay(FADE_OUT_MS / FADE_STEPS)
+                }
+                c.pause()
+            }
+        } finally {
+            c?.volume = 1f
+            _state.update { it.copy(sleepTimerEndsAtMs = null) }
+        }
+    }
+
     // ──────── Private ────────
 
     private fun startPlayback(
@@ -192,7 +256,7 @@ class Media3PlayerController(context: Context) : PlayerController {
         startPositionMs: Long
     ) {
         c.setMediaItems(
-            queue.episodes.map { it.toMediaItem(podcastTitle) },
+            queue.episodes.map { it.toMediaItem(podcastTitle, localAudioPath(it.id)) },
             queue.startIndex,
             startPositionMs      // ← Media3 ကိုယ်တိုင် အဲဒီနေရာက စဖွင့်တယ် (seekTo ခေါ်စရာ မလို)
         )
@@ -243,6 +307,8 @@ class Media3PlayerController(context: Context) : PlayerController {
 
     private companion object {
         const val POSITION_UPDATE_MS = 500L
+        const val FADE_OUT_MS = 10_000L
+        const val FADE_STEPS = 20
     }
 }
 
@@ -250,7 +316,11 @@ class Media3PlayerController(context: Context) : PlayerController {
 private fun Player.knownDurationMs(): Long =
     duration.takeIf { it != C.TIME_UNSET && it > 0 } ?: 0L
 
-private fun Episode.toMediaItem(podcastTitle: String): MediaItem {
+/**
+ * ဒေါင်းထားရင် local ဖိုင်ကို ဖွင့် — ဒီလို player ထဲမှာ ဖြေရှင်းလို့ Detail · ဆက်နားထောင်ရန် · Library
+ * ဘယ်ကနေ ဖွင့်ဖွင့် offline ရတယ်။ User က ဖိုင် ဖျက်ထားရင် (`exists()` false) stream ပြန်သုံး။
+ */
+private fun Episode.toMediaItem(podcastTitle: String, localPath: String?): MediaItem {
     val metadata = MediaMetadata.Builder()
         .setTitle(title)
         .setArtist(podcastTitle)
@@ -259,7 +329,10 @@ private fun Episode.toMediaItem(podcastTitle: String): MediaItem {
 
     return MediaItem.Builder()
         .setMediaId(id)
-        .setUri(audioUrl)
+        .setUri(
+            localPath?.let(::File)?.takeIf { it.exists() }?.let(Uri::fromFile)
+                ?: Uri.parse(audioUrl)
+        )
         .setMediaMetadata(metadata)
         .build()
 }

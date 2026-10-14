@@ -2,6 +2,7 @@ package com.example.myancast.domain.util
 
 import com.google.firebase.Timestamp
 import java.util.Calendar
+import java.util.TimeZone
 
 private val MYANMAR_MONTHS = arrayOf(
     "ဇန်နဝါရီ", "ဖေဖော်ဝါရီ", "မတ်", "ဧပြီ", "မေ", "ဇွန်",
@@ -33,9 +34,9 @@ fun formatRelativeMillis(epochMillis: Long, now: Long): String {
     }
 }
 
-/** "၁၅ စက်တင်ဘာ ၂၀၂၅" — Locale မမှီခိုဘူး */
-private fun formatFullDate(epochMillis: Long): String {
-    val cal = Calendar.getInstance().apply {
+/** "၁၅ စက်တင်ဘာ ၂၀၂၅" — Locale မမှီခိုဘူး (Admin ရဲ့ ထုတ်လွှင့်ရက် ခလုတ်ကလည်း သုံး) */
+internal fun formatFullDate(epochMillis: Long, zone: TimeZone = TimeZone.getDefault()): String {
+    val cal = Calendar.getInstance(zone).apply {
         timeInMillis = epochMillis
     }
     val d = cal.get(Calendar.DAY_OF_MONTH).toMyanmarDigits()

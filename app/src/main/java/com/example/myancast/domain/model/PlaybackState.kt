@@ -14,7 +14,10 @@ data class PlaybackState(
     val positionMs: Long = 0L,
     val durationMs: Long = 0L,                // 0 = မသိရသေး (stream load နေဆဲ)
     val speed: Float = 1f,
-    val error: String? = null
+    val error: String? = null,
+    // ★ Phase 6 (#3) — sleep timer (additive — default ပါလို့ ရှိပြီးသား code မပျက်)
+    val sleepTimerEndsAtMs: Long? = null,     // wall clock · null = မိနစ် timer မရှိ
+    val sleepAtEpisodeEnd: Boolean = false
 ) {
     val currentEpisode: Episode? get() = queue.getOrNull(currentIndex)
     val hasEpisode: Boolean get() = currentEpisode != null

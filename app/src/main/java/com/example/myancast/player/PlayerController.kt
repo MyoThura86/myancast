@@ -1,6 +1,7 @@
 package com.example.myancast.player
 
 import com.example.myancast.domain.model.PlaybackState
+import com.example.myancast.domain.model.SleepTimerOption
 import kotlinx.coroutines.flow.StateFlow
 
 /**
@@ -24,4 +25,7 @@ interface PlayerController {
     fun next()
     fun previous()
     fun setSpeed(speed: Float)
+
+    /** ★ Phase 6 (#3) — default က ဘာမှ မလုပ်ဘူး (fake တွေ ပြင်စရာ မလို) */
+    fun setSleepTimer(option: SleepTimerOption) {}
 }
